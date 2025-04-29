@@ -2,25 +2,18 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
-// Register
 router.post('/register', async (req, res) => {
   const { email, password, userType, address, contact } = req.body;
-
   const userExists = await User.findOne({ email });
   if (userExists) return res.status(400).json({ message: 'User already exists' });
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const newUser = new User({
-    email,
-    password: hashedPassword,
-    userType,
-    address,
-    contact,
-  });
+  const newUser = new User({ email, password: hashedPassword, userType, address, contact });
 
   try {
     await newUser.save();
@@ -30,10 +23,8 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-
   const user = await User.findOne({ email });
   if (!user) return res.status(400).json({ message: 'User not found' });
 
@@ -45,9 +36,12 @@ router.post('/login', async (req, res) => {
   res.json({ message: 'Login successful', token });
 });
 
-// Test Route
 router.get('/test', (req, res) => {
   res.json({ message: 'API working!' });
+});
+
+router.get('/protected', authMiddleware, (req, res) => {
+  res.json({ message: 'You accessed a protected route!', user: req.user });
 });
 
 module.exports = router;
