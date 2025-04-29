@@ -2,10 +2,11 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const authMiddleware = require('../middleware/authMiddleware');
+const { verifyToken } = require('../middleware/authMiddleware'); // Using the updated verifyToken
 
 const router = express.Router();
 
+// Registration Route
 router.post('/register', async (req, res) => {
   const { email, password, userType, address, contact } = req.body;
   const userExists = await User.findOne({ email });
@@ -23,6 +24,7 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// Login Route
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -36,11 +38,13 @@ router.post('/login', async (req, res) => {
   res.json({ message: 'Login successful', token });
 });
 
+// Test Route
 router.get('/test', (req, res) => {
   res.json({ message: 'API working!' });
 });
 
-router.get('/protected', authMiddleware, (req, res) => {
+// Protected Route
+router.get('/protected', verifyToken, (req, res) => { // Using verifyToken for protected route
   res.json({ message: 'You accessed a protected route!', user: req.user });
 });
 

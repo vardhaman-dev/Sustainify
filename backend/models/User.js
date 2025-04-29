@@ -1,3 +1,5 @@
+// backend/models/User.js
+
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -6,6 +8,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
     lowercase: true,
+    match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address'],  // Email format validation
   },
   password: {
     type: String,
