@@ -6,7 +6,8 @@ const {
   getAllProducts,
   getProductById,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  searchProducts
 } = require('../controllers/productController');
 
 // POST /api/products - Create a product listing
@@ -14,6 +15,9 @@ router.post('/', verifyToken, createProduct);
 
 // GET /api/products - Get all listings
 router.get('/', getAllProducts);
+
+// GET /api/products/search - Search products
+router.get('/search', searchProducts);
 
 // GET /api/products/:id - Get single listing
 router.get('/:id', getProductById);
